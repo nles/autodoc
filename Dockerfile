@@ -1,7 +1,3 @@
-# USAGE:
-# docker build . -t autodoc
-# docker run --mount src=`pwd`,target=/app,type=bind --network=host --env-file ./env -v $pwd:/app autodoc
-
 FROM ubuntu:18.04
 
 WORKDIR /app
@@ -15,6 +11,11 @@ RUN apt-get install -y libdbi-perl \
 COPY . .
 
 RUN make install
+
+ARG container_user_id
+RUN useradd --shell /bin/bash -u $container_user_id -o -c "" -m user-in-container
+RUN chown -R user-in-container:user-in-container /app
+USER user-in-container
 
 ENV DATABASE=app \
   HOST=localhost \
